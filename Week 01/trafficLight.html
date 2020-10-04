@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>红绿灯</title>
+    <style>
+        ul, li{
+            margin:0;
+            padding:0;
+            list-style: none;
+        }
+        li{
+            display: inline-block;
+            width: 120px;
+            height: 120px;
+            background: #666;
+            border-radius: 50%;
+        }
+        .red.active{background: #fb0601;}
+        .yellow.active{background: #ffc900;}
+        .green.active{background: #8fc965;}
+    </style>
+</head>
+<body>
+    <ul>
+        <li class="red"></li>
+        <li class="yellow"></li>
+        <li class="green"></li>
+    </ul>
+
+    <script>
+    const Lights = {
+        timer: -1,
+        // 当前亮灯的序号
+        currentIndex: 0,
+        // 持续时间数组
+        duration: [10000, 2000, 5000],
+
+        lightByIndex: function(index) {
+
+            const lights = document.querySelectorAll('li');
+
+            const lightsLen = lights.length;
+
+            // 如果超过灯的数量，变为 0
+            if(index >= lightsLen){
+                index = 0;
+            }
+
+            this.currentIndex = index;
+
+            // 先让所有灯熄灭
+            lights.forEach((node, lightIndex) => {
+                if(lightIndex === index){
+                    node.classList.add('active');
+                }else{
+                    node.classList.remove('active');
+                }
+            });            
+
+            // 先清空上一次的 setTimeout
+            if(this.timer){
+                clearTimeout(this.timer);
+            }
+
+            // 达到时间，就亮下一盏灯
+            this.timer = setTimeout(() => {
+                this.lightNext();
+            }, this.duration[index]);
+        },
+        // 亮下一盏灯
+        lightNext: function() {
+            this.lightByIndex(this.currentIndex + 1);
+        },
+    };
+
+    Lights.lightByIndex(0);
+    </script>
+
+</body>
+</html>

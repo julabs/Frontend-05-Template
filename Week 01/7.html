@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TicTacToe</title>
+    <style>
+    .board{
+        width: 306px
+    }
+    .cell{
+        display: inline-block;
+        width:100px;
+        height: 100px;
+        border: 1px solid white;
+
+        background-color: green;
+
+        vertical-align: middle;
+        line-height: 100px;
+        font-size: 50px;
+        text-align: center;
+    }
+    </style>
+</head>
+<body>
+
+    <div id="board" class="board"></div>
+
+    <script>
+
+    const T_COUNT = 3;
+
+    let isGameOver = false;
+
+    const pattern = [
+        0, 0, 0,
+        0, 0, 0,
+        0, 0, 0,
+    ];
+
+    let color = 1;
+
+    function show(){
+        const board = document.getElementById('board');
+
+        board.innerHTML = '';
+
+        for(let i = 0; i < T_COUNT; i++){
+            for(let j = 0; j < T_COUNT; j++){
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.innerHTML = pattern[i * T_COUNT + j] === 2 ? '❌' : pattern[i * T_COUNT + j] == 1 ? '⭕️' : '';
+                cell.addEventListener('click', () => move(j, i));
+                board.appendChild(cell);
+            }
+        }
+    }
+
+    function move(x, y){
+
+        // 已经结束了
+        if(isGameOver){
+            alert('比赛已经结束');
+            return;
+        }
+
+        // 如果当前为空值，可以点
+        if(pattern[y * T_COUNT + x] === 0){
+            pattern[y * T_COUNT + x] = color;
+
+            if(check(pattern, color)){
+                isGameOver = true;
+                alert((color === 2 ? '❌' : '⭕️') + ' is winner!');
+            }
+
+            color = 3 - color;
+
+            console.log(bestChoice(pattern, color));
+
+            show();
+
+            if(willWin(pattern, color)){
+                console.log((color === 2 ? '❌' : '⭕️') + ' will win!');
+            }
+        }
+
+        checkIsGameOver();
+
+        
+    }
+
+    function check(pattern, color){
+        // 查横行
+        for(let i = 0; i < T_COUNT; i++){
+            let win = true;
+            for(let j = 0; j < T_COUNT; j++){
+                if(pattern[i * T_COUNT + j] !== color){
+                    win = false;
+                }
+            }
+            if(win){
+                return true;
+            }
+        }
+        // 查竖行
+        for(let i = 0; i < T_COUNT; i++){
+            let win = true;
+            for(let j = 0; j < T_COUNT; j++){
+                if(pattern[j * T_COUNT + i] !== color){
+                    win = false;
+                }
+            }
+            if(win){
+                return true;
+            }
+        }
+
+
+        // 斜向右上往左下
+        {
+            /** 加中括号，可以让 win 变成一个局部变量 */
+            let win = true;
+            for(let j = 0; j < T_COUNT; j++){
+                if(pattern[(j + 1) * T_COUNT - j - 1] !== color){
+                    win = false;
+                }
+            }
+            if(win){
+                return true;
+            }
+        }
+
+        // 斜向左上往右下
+        {
+            let win = true;
+            for(let j = 0; j < T_COUNT; j++){
+                if(pattern[j * T_COUNT + j] !== color){
+                    win = false;
+                }
+            }
+            if(win){
+                return true;
+            }
+        }
+
+    }
+
+    function clone(pattern){
+        // return Object.create(pattern);
+    }
+
+    function checkIsGameOver(){
+
+        if(isGameOver){
+            return true;
+        }
+
+        for(let i = 0; i < T_COUNT; i++){
+            for(let j = 0; j < T_COUNT; j++){
+                if(pattern[i * T_COUNT + j] === 0){
+                    return false;
+                }
+            }
+        }
+
+        isGameOver = true;
+
+        return true;
+
+    }
+
+    function willWin(pattern, color){
+        for(let i = 0; i < T_COUNT; i++){
+            for(let j = 0; j < T_COUNT; j++){
+                if(pattern[i * T_COUNT + j] !== 0){
+                    continue;
+                }
+
+                let tmp = clone(pattern);
+                tmp[i * T_COUNT + j] = color;
+                if(check(tmp, color)){
+                    return [j, i];
+                }
+            }
+        }
+
+        return null;
+    }
+
+    function bestChoice(pattern, color){
+
+        let point = willWin(pattern, color);
+
+        if(point){
+            return {
+                point,
+                result: 1, // 1 代表胜
+            };
+        }
+
+        // 初始化，result 最终会返回 -1 负，0 和， 1 胜
+        let result = -1;
+
+        outer: for(let i = 0; i < T_COUNT; i++){
+            for(let j = 0; j < T_COUNT; j++){
+                // 如果当前是非空值，直接进入下一个循环
+                if(pattern[i * T_COUNT + j] !== 0){
+                    continue;
+                }
+
+                // 如果已经走了这个子，看对方的策略
+                let tmp = clone(pattern);
+                tmp[i * T_COUNT + j] = color;
+                let r = bestChoice(tmp, 3 - color).result;
+
+                // 找留给对方最差的点
+                if(-r >= result){
+                    result = -r;
+                    point = [j, i];
+                }
+
+                // 如果可以胜
+                // win-lost 剪枝
+                if(result === 1){
+                    break outer;
+                }
+
+            }
+            
+        }
+
+        return {
+            point,
+            result: point ? result : 0
+        }
+
+    }
+
+    show();
+
+    </script>
+</body>
+</html>
