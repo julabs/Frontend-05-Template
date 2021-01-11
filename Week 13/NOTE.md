@@ -293,3 +293,8 @@ API 主要来源于４个标准化组织
 - W3C
   - webaudio
   - CG/WG
+
+### 作业与实验：全部 API 的分类和整理
+
+重点掌握的 API：
+- [whatwg](https://spec.whatwg.org/)
