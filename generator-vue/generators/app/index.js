@@ -25,12 +25,13 @@ module.exports = class extends Generator {
             "description": "",
             "main": "generators/app/index.js",
             "scripts": {
-                "test": "echo \"Error: no test specified\" && exit 1"
+                "test": "echo \"Error: no test specified\" && exit 1",
+                "start": "webpack"
             },
             "author": "",
             "license": "ISC",
             "devDependencies": {
-                
+                "html-webpack-plugin": "^5.0.0-beta.6",
             },
             "dependencies": {
             }
@@ -39,13 +40,12 @@ module.exports = class extends Generator {
         this.fs.extendJSON(this.destinationPath('package.json'), pkgJson);
         this.npmInstall(["vue"], {'save-dev': false});
         this.npmInstall([
-            "webpack", "html-webpack-plugin",
+            "webpack",
             "vue-template-compiler", "babel-loader", 
             "vue-loader", "vue-style-loader", 
+            "copy-webpack-plugin",
             "css-loader"], {'save-dev': true});
-    }
 
-    copyFiles(){
         this.fs.copyTpl(
             this.templatePath('main.js'),
             this.destinationPath('src/main.js'),
